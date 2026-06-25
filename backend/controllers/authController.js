@@ -30,22 +30,16 @@ exports.signup = async (req, res) => {
 
         await user.save();
 
-        // 🟢 FIX: Dedicated Try-Catch for Email sending on Render
-        try {
-            console.log(`Sending OTP to ${email}...`);
-            await sendOTPEmail(email, otp, "signup");
-            return res.status(200).json({ message: "OTP sent to email for verification" });
-        } catch (emailError) {
-            console.error("🔴 EMAIL SENDING FAILED ON RENDER:", emailError);
+        // 🟢 EMAIL KO BACKGROUND ME BHEJENGE (AWAIT HATA DIYA)
+        sendOTPEmail(email, otp, "signup")
+            .then(() => console.log(`🟢 Email triggered for ${email}`))
+            .catch((err) => console.error("🔴 Email delivery failed in background:", err.message));
 
-            // Agar email fail ho jaye toh error response do taaki app stuck na ho
-            return res.status(502).json({
-                message: "Account initiated, but failed to send OTP email. Please check server configurations.",
-                error: emailError.message
-            });
-        }
+        // Frontend ko turant free karo taaki 502 error na aaye
+        return res.status(200).json({ message: "OTP sent to email for verification" });
 
     } catch (error) {
+        console.error("🔴 Signup Controller Main Error:", error.message);
         res.status(500).json({ message: error.message });
     }
 };
@@ -82,7 +76,7 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-
+        
         if (!user) return res.status(404).json({ message: "User not found" });
         if (!user.isVerified) return res.status(401).json({ message: "Please verify your email first" });
 
@@ -100,7 +94,7 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
-
+        
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const otp = generateOTP();

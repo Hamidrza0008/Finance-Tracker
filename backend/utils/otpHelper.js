@@ -5,18 +5,16 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp, purpose) => {
-    // 🟢 FIX: Host, Port aur TLS add kiya taaki Render block na kare
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
-        port: 465, // Agar 465 pe timeout ho, toh ise 587 aur secure ko false kar dena
-        secure: true, 
-        pool: true, // Connection pooling se performance behtar hoti hai
+        port: 587, // Cloud ke liye sabse safe port
+        secure: false, // 587 ke liye false hi hoga
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS, // Make sure ye 16-digit App Password ho
+            pass: process.env.EMAIL_PASS,
         },
         tls: {
-            rejectUnauthorized: false // Strict SSL checking ko bypass karne ke liye (Cloud ke liye zaroori)
+            rejectUnauthorized: false // Cloud networks pe handshake fail nahi hone deta
         }
     });
 
@@ -27,7 +25,7 @@ const sendOTPEmail = async (email, otp, purpose) => {
 
     const mailOptions = {
         from: `"FinTrack Auth" <${process.env.EMAIL_USER}>`,
-        to: email,
+        to: email, // Jisne signup kiya usko jayega
         subject: subjects[purpose] || "Verification Code",
         html: `
             <div style="font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
@@ -39,12 +37,12 @@ const sendOTPEmail = async (email, otp, purpose) => {
         `
     };
 
-    // 🟢 FIX: Yahan catch block lagaya taaki error seedhe controller tak pahunche
     try {
         await transporter.sendMail(mailOptions);
+        console.log(`🟢 OTP sent successfully to ${email}`);
     } catch (error) {
-        console.error("Nodemailer transport error inside helper:", error);
-        throw new Error(error.message); // Controller ko error pass karega
+        console.error("🔴 Nodemailer Error inside Helper:", error.message);
+        throw error;
     }
 };
 

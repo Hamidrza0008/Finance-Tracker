@@ -17,6 +17,17 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://expanse-tracker-chi.vercel.app"
+  ],
+  credentials: true
+}));
+
+app.options("*", cors());
+
+
 // Routes Integration
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);

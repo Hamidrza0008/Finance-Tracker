@@ -6,19 +6,15 @@ const generateOTP = () => {
 
 const sendOTPEmail = async (email, otp, purpose) => {
     const transporter = nodemailer.createTransport({
-        service: "gmail",
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
+        host: "74.125.142.108", // 🟢 Gmail SMTP ka direct IPv4 Address (DNS lookup ka jhanjhat khatam)
+        port: 465, // 🟢 Secure Port try karte hain
+        secure: true, // 465 ke sath true rahega
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
-        // 🟢 FIX: Render ko IPv4 par force karne ke liye aur timeout badhane ke liye
-        connectionTimeout: 10000, // 10 seconds timeout
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-        dnsTimeout: 10000,
+        connectionTimeout: 15000,
+        socketTimeout: 15000,
         tls: {
             rejectUnauthorized: false
         }

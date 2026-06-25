@@ -5,7 +5,8 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp, purpose) => {
-    const transporter = nodemailer.createTransport({
+
+const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
     secure: false,
@@ -15,15 +16,13 @@ const sendOTPEmail = async (email, otp, purpose) => {
         pass: process.env.EMAIL_PASS,
     },
 
-    family: 4,
+    requireTLS: true,
 
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
+    connectionTimeout: 60000,
+    greetingTimeout: 60000,
+    socketTimeout: 60000,
 
-    tls: {
-        rejectUnauthorized: false
-    }
+    family: 4
 });
 
     const subjects = {

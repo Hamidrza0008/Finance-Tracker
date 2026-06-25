@@ -9,18 +9,19 @@ const sendOTPEmail = async (email, otp, purpose) => {
     };
 
     try {
-        // 🟢 Brevo Direct HTTP API Call (No SMTP, No Port, No IP Blocking!)
+        // 🟢 Direct HTTP API Call 
         const response = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
             headers: {
                 "accept": "application/json",
-                "api-key": process.env.EMAIL_PASS, // Tumhari wahi xsmtpsib-... wali key kaam karegi
+            
+                "api-key": "xsmtpsib-d3dc7167295ea818c94dd65fc2a4a8469ab84c3e6bd36f413c37eeb3974869a8-6iwYvCkWXCugyari", 
                 "content-type": "application/json"
             },
             body: JSON.stringify({
                 sender: { 
                     name: "FinTrack Auth", 
-                    email: "hamidansariraja546@gmail.com" // 👈 Apni real login email id yahan dalo jisse Brevo account banaya hai
+                    email: "hamidansariraja546@gmail.com" 
                 },
                 to: [{ email: email }],
                 subject: subjects[purpose] || "Verification Code",
@@ -41,7 +42,7 @@ const sendOTPEmail = async (email, otp, purpose) => {
             throw new Error(data.message || "Brevo API Error");
         }
 
-        console.log(`🟢 SUCCESS: Brevo API sent OTP successfully to ${email}`);
+        console.log(`🟢 SUCCESS: OTP delivered successfully to ${email}`);
     } catch (error) {
         console.error("🔴 BREVO API ERROR:", error.message);
         throw error;

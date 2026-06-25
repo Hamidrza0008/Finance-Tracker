@@ -14,15 +14,26 @@ const app = express();
 connectDB();
 
 // CORS Configuration
+const allowedOrigins = [
+  'https://expanse-tracker-chi.vercel.app', // Aapki live Vercel site
+  'http://localhost:3000'                    // Aapka local development url
+];
+
 const corsOptions = {
-  origin: "https://expanse-tracker-chi.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-  optionsSuccessStatus: 200 
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or postman/curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true 
 };
 
-// This single line handles BOTH regular requests and OPTIONS preflight requests automatically
+// Use CORS with options
 app.use(cors(corsOptions));
 
 // Body Parser Middleware

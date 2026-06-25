@@ -19,7 +19,7 @@ export default function Profile() {
           return;
         }
 
-        const response = await fetch('https://expanse-tracker-9g95.onrender.com/api/user/profile', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

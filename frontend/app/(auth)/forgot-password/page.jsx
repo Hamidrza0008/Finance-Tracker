@@ -6,6 +6,7 @@ import { Mail, KeyRound, ArrowLeft, Wallet, CheckCircle2, AlertCircle, X, Lock }
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
+
 export default function ForgotPassword() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -40,7 +41,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("https://expanse-tracker-9g95.onrender.com/api/auth/forgot-password", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/forgot-password`, {
         email: form.email
       });
       showToast(res.data.message || "OTP sent to email", "success");
@@ -57,7 +58,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post("https://expanse-tracker-9g95.onrender.com/api/auth/reset-password", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-password`, {
         email: form.email,
         otp: form.otp,
         newPassword: form.newPassword

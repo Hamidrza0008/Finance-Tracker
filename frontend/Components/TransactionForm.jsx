@@ -51,7 +51,7 @@ export default function TransactionForm() {
         return;
       }
 
-      const response = await fetch('https://expanse-tracker-9g95.onrender.com/api/transactions/add', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

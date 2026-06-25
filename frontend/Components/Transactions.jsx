@@ -47,7 +47,7 @@ export default function Transactions() {
         sort: sortKey,
       });
 
-      const res = await fetch(`https://expanse-tracker-9g95.onrender.com/api/transactions?${queryParams.toString()}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transactions?${queryParams.toString()}`, {
         method: "GET",
         headers: { 
           "Content-Type": "application/json",

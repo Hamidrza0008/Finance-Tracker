@@ -46,7 +46,7 @@ export default function SignupForm() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await fetch("https://expanse-tracker-9g95.onrender.com/api/auth/signup", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -72,10 +72,10 @@ export default function SignupForm() {
   };
 
   const handleVerifyOTP = async (e) => {
-    e.preventDefault();
+    e.preventDefault();verify-otp
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5000/api/auth/verify-otp", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

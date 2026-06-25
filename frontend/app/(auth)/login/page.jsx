@@ -39,7 +39,7 @@ export default function LoginForm() {
     try {
       setLoading(true);
 
-      const res = await fetch("https://expanse-tracker-9g95.onrender.com/api/auth/login", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

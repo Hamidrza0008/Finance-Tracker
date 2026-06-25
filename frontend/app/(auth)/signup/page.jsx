@@ -72,7 +72,7 @@ export default function SignupForm() {
   };
 
   const handleVerifyOTP = async (e) => {
-    e.preventDefault();verify-otp
+    e.preventDefault(); // Fixed typo here
     try {
       setLoading(true);
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`, {

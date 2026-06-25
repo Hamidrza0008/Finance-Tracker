@@ -13,15 +13,25 @@ const app = express();
 // Connect DB
 connectDB();
 
-app.use(cors({
+// CORS Configuration
+const corsOptions = {
   origin: "https://expanse-tracker-chi.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
-}));
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
 
-app.options(/.*/, cors());
+// Apply CORS to all routes
+app.use(cors(corsOptions));
+
+// Handle preflight requests for all routes automatically
+app.options("*", cors(corsOptions));
+
+// Body Parser Middleware
 app.use(express.json());
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/transactions", transactionRoutes);
@@ -34,5 +44,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

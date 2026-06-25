@@ -9,18 +9,18 @@ const sendOTPEmail = async (email, otp, purpose) => {
     };
 
     try {
-        // 🟢 Pure HTTP API Call using Render Environment Variables
+        // 🟢 Pure HTTP API Call - Ab ye environment variables se hi chalega
         const response = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
             headers: {
                 "accept": "application/json",
-                "api-key": process.env.EMAIL_PASS, // 👈 Render Dashboard se API Key uthayega
+                "api-key": process.env.EMAIL_PASS, // 👈 Ab ye local `.env` ya Render Dashboard se sahi key uthayega
                 "content-type": "application/json"
             },
             body: JSON.stringify({
                 sender: { 
                     name: "FinTrack Auth", 
-                    email: process.env.EMAIL_USER // 👈 Render Dashboard se Brevo registered email uthayega
+                    email: process.env.EMAIL_USER // 👈 Render/Local .env se registered email uthayega
                 },
                 to: [{ email: email }],
                 subject: subjects[purpose] || "Verification Code",

@@ -30,7 +30,7 @@ export default function SummaryCards() {
         throw new Error('No token found. Please log in.');
       }
 
-      const response = await fetch('http://localhost:5000/api/transactions/all', {
+      const response = await fetch('https://expanse-tracker-9g95.onrender.com/api/transactions/all', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

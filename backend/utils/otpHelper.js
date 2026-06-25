@@ -9,19 +9,18 @@ const sendOTPEmail = async (email, otp, purpose) => {
     };
 
     try {
-        // 🟢 Direct HTTP API Call 
+        // 🟢 Pure HTTP API Call using Render Environment Variables
         const response = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
             headers: {
                 "accept": "application/json",
-            
-                "api-key": "xsmtpsib-d3dc7167295ea818c94dd65fc2a4a8469ab84c3e6bd36f413c37eeb3974869a8-6iwYvCkWXCugyari", 
+                "api-key": process.env.EMAIL_PASS, // 👈 Render Dashboard se API Key uthayega
                 "content-type": "application/json"
             },
             body: JSON.stringify({
                 sender: { 
                     name: "FinTrack Auth", 
-                    email: "hamidansariraja546@gmail.com" 
+                    email: process.env.EMAIL_USER // 👈 Render Dashboard se Brevo registered email uthayega
                 },
                 to: [{ email: email }],
                 subject: subjects[purpose] || "Verification Code",

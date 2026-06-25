@@ -5,25 +5,19 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp, purpose) => {
-
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-
-    requireTLS: true,
-
-    connectionTimeout: 60000,
-    greetingTimeout: 60000,
-    socketTimeout: 60000,
-
-    family: 4
-});
+    // 🟢 Brevo SMTP Setup - Port 2525 Render par hamesha khula rehta hai
+    const transporter = nodemailer.createTransport({
+        host: "smtp-relay.brevo.com",
+        port: 2525, 
+        secure: false,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
 
     const subjects = {
         "signup": "Verify Your Account - OTP",
@@ -32,7 +26,7 @@ const transporter = nodemailer.createTransport({
 
     const mailOptions = {
         from: `"FinTrack Auth" <${process.env.EMAIL_USER}>`,
-        to: email, // Ab kisi bhi email par bhej kar check karo
+        to: email, // Ab poori duniya ka koi bhi email dalo, sabpe jayega!
         subject: subjects[purpose] || "Verification Code",
         html: `
             <div style="font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
@@ -46,9 +40,9 @@ const transporter = nodemailer.createTransport({
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`🟢 SUCCESS: Gmail sent OTP successfully to ${email}`);
+        console.log(`🟢 SUCCESS: Brevo sent OTP successfully to ${email}`);
     } catch (error) {
-        console.error("🔴 NODEMAILER GMAIL ERROR:", error.message);
+        console.error("🔴 BREVO SMTP ERROR:", error.message);
         throw error;
     }
 };

@@ -19,14 +19,11 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
-  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+  optionsSuccessStatus: 200 
 };
 
-// Apply CORS to all routes
+// This single line handles BOTH regular requests and OPTIONS preflight requests automatically
 app.use(cors(corsOptions));
-
-// Handle preflight requests for all routes automatically
-app.options("*", cors(corsOptions));
 
 // Body Parser Middleware
 app.use(express.json());

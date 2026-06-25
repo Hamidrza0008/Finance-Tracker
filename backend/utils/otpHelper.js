@@ -14,7 +14,7 @@ const sendOTPEmail = async (email, otp, purpose) => {
             method: "POST",
             headers: {
                 "accept": "application/json",
-                "api-key": process.env.EMAIL_PASS, // 👈 Ab ye local `.env` ya Render Dashboard se sahi key uthayega
+                "api-key": "xsmtpsib-d3dc7167295ea818c94dd65fc2a4a8469ab84c3e6bd36f413c37eeb3974869a8-U8nbahE8poeZjFer",
                 "content-type": "application/json"
             },
             body: JSON.stringify({

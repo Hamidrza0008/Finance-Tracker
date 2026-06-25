@@ -6,17 +6,20 @@ const generateOTP = () => {
 
 const sendOTPEmail = async (email, otp, purpose) => {
     const transporter = nodemailer.createTransport({
-        host: "74.125.142.108", // 🟢 Gmail SMTP ka direct IPv4 Address (DNS lookup ka jhanjhat khatam)
-        port: 465, // 🟢 Secure Port try karte hain
-        secure: true, // 465 ke sath true rahega
+        // 🟢 'service' mat likhna, direct host name dalo
+        host: "smtp.gmail.com",
+        port: 465, // Secure SSL port
+        secure: true, // 465 ke sath hamesha true rahega
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
-        connectionTimeout: 15000,
+        // 🔴 CRITICAL FIX FOR RENDER: Ise dhyan se lagao
+        family: 4, // 👈 Yeh Nodemailer ko strictly bolta hai ki sirf IPv4 use kare (IPv6 ka ENETUNREACH error khatam)
+        connectionTimeout: 15000, // Timeout badha diya taaki server thoda intezar kare
         socketTimeout: 15000,
         tls: {
-            rejectUnauthorized: false
+            rejectUnauthorized: false // Cloud networks pe authentication handshake ko pass karwane ke liye
         }
     });
 
@@ -27,7 +30,7 @@ const sendOTPEmail = async (email, otp, purpose) => {
 
     const mailOptions = {
         from: `"FinTrack Auth" <${process.env.EMAIL_USER}>`,
-        to: email,
+        to: email, // Ab kisi bhi email par bhej kar check karo
         subject: subjects[purpose] || "Verification Code",
         html: `
             <div style="font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
@@ -41,9 +44,9 @@ const sendOTPEmail = async (email, otp, purpose) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`🟢 SUCCESS: OTP sent successfully to ${email}`);
+        console.log(`🟢 SUCCESS: Gmail sent OTP successfully to ${email}`);
     } catch (error) {
-        console.error("🔴 NODEMAILER BACKGROUND ERROR:", error.message);
+        console.error("🔴 NODEMAILER GMAIL ERROR:", error.message);
         throw error;
     }
 };

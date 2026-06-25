@@ -5,16 +5,19 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp, purpose) => {
+    // 🟢 Gmail + Port 587 ka ultimate production combination
     const transporter = nodemailer.createTransport({
+        service: "gmail", 
         host: "smtp.gmail.com",
-        port: 587, // Cloud ke liye sabse safe port
-        secure: false, // 587 ke liye false hi hoga
+        port: 587,
+        secure: false, // 587 ke sath false hi rahega
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            pass: process.env.EMAIL_PASS, // Tumhara 16-digit app password
         },
         tls: {
-            rejectUnauthorized: false // Cloud networks pe handshake fail nahi hone deta
+            rejectUnauthorized: false,
+            ciphers: 'SSLv3' // Render ke secure handshake ko pass karwane ke liye
         }
     });
 
@@ -25,7 +28,7 @@ const sendOTPEmail = async (email, otp, purpose) => {
 
     const mailOptions = {
         from: `"FinTrack Auth" <${process.env.EMAIL_USER}>`,
-        to: email, // Jisne signup kiya usko jayega
+        to: email,
         subject: subjects[purpose] || "Verification Code",
         html: `
             <div style="font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
@@ -39,9 +42,9 @@ const sendOTPEmail = async (email, otp, purpose) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`🟢 OTP sent successfully to ${email}`);
+        console.log(`🟢 SUCCESS: OTP sent successfully to ${email}`);
     } catch (error) {
-        console.error("🔴 Nodemailer Error inside Helper:", error.message);
+        console.error("🔴 NODEMAILER BACKGROUND ERROR:", error.message);
         throw error;
     }
 };

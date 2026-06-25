@@ -2,7 +2,6 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { generateOTP, sendOTPEmail } = require("../utils/otpHelper");
-
 exports.signup = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -31,18 +30,21 @@ exports.signup = async (req, res) => {
 
         await user.save();
 
-        // Safe isolation for email service to avoid hanging states
+        // 🟢 FIX: Dedicated Try-Catch for Email sending on Render
         try {
+            console.log(`Sending OTP to ${email}...`);
             await sendOTPEmail(email, otp, "signup");
+            return res.status(200).json({ message: "OTP sent to email for verification" });
         } catch (emailError) {
-            console.error("Critical Nodemailer Error:", emailError.message);
-            return res.status(201).json({ 
-                message: "User registered in DB, but email delivery failed. Check SMTP credentials.",
-                otp: process.env.NODE_ENV === "development" ? otp : undefined 
+            console.error("🔴 EMAIL SENDING FAILED ON RENDER:", emailError);
+
+            // Agar email fail ho jaye toh error response do taaki app stuck na ho
+            return res.status(502).json({
+                message: "Account initiated, but failed to send OTP email. Please check server configurations.",
+                error: emailError.message
             });
         }
 
-        res.status(200).json({ message: "OTP sent to email for verification" });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -52,10 +54,7 @@ exports.verifyOTP = async (req, res) => {
     try {
         const { email, otp, purpose } = req.body;
 
-        // Ensure string configuration is uniform
-        const normalizedPurpose = purpose ? purpose.toLowerCase() : "signup";
-
-        const user = await User.findOne({ email, otpPurpose: normalizedPurpose });
+        const user = await User.findOne({ email, otpPurpose: purpose });
         if (!user) {
             return res.status(404).json({ message: "Invalid request or session expired" });
         }
@@ -64,7 +63,7 @@ exports.verifyOTP = async (req, res) => {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
 
-        if (normalizedPurpose === "signup") {
+        if (purpose === "signup") {
             user.isVerified = true;
             user.otp = null;
             user.otpExpiry = null;
@@ -83,7 +82,7 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
-        
+
         if (!user) return res.status(404).json({ message: "User not found" });
         if (!user.isVerified) return res.status(401).json({ message: "Please verify your email first" });
 
@@ -101,7 +100,7 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
-        
+
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const otp = generateOTP();
@@ -110,13 +109,7 @@ exports.forgotPassword = async (req, res) => {
         user.otpPurpose = "reset-password";
 
         await user.save();
-
-        try {
-            await sendOTPEmail(email, otp, "reset-password");
-        } catch (emailError) {
-            console.error("Nodemailer ForgotPassword Error:", emailError.message);
-            return res.status(500).json({ message: "Database updated, but failed to send verification email." });
-        }
+        await sendOTPEmail(email, otp, "reset-password");
 
         res.status(200).json({ message: "OTP sent to your email" });
     } catch (error) {

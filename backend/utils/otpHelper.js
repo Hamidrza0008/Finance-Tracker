@@ -5,12 +5,19 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp, purpose) => {
+    // 🟢 FIX: Host, Port aur TLS add kiya taaki Render block na kare
     const transporter = nodemailer.createTransport({
-        service: "Gmail",
+        host: "smtp.gmail.com",
+        port: 465, // Agar 465 pe timeout ho, toh ise 587 aur secure ko false kar dena
+        secure: true, 
+        pool: true, // Connection pooling se performance behtar hoti hai
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            pass: process.env.EMAIL_PASS, // Make sure ye 16-digit App Password ho
         },
+        tls: {
+            rejectUnauthorized: false // Strict SSL checking ko bypass karne ke liye (Cloud ke liye zaroori)
+        }
     });
 
     const subjects = {
@@ -32,7 +39,13 @@ const sendOTPEmail = async (email, otp, purpose) => {
         `
     };
 
-    await transporter.sendMail(mailOptions);
+    // 🟢 FIX: Yahan catch block lagaya taaki error seedhe controller tak pahunche
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error("Nodemailer transport error inside helper:", error);
+        throw new Error(error.message); // Controller ko error pass karega
+    }
 };
 
 module.exports = { generateOTP, sendOTPEmail };

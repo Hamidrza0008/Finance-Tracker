@@ -13,26 +13,15 @@ const app = express();
 // Connect DB
 connectDB();
 
-// ======================
-// 🔥 CORS (ONLY ONCE)
-// ======================
 app.use(cors({
   origin: "https://expanse-tracker-chi.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
 
-// 🔥 IMPORTANT: preflight handling
-app.options("*", cors());
-
-// ======================
-// Middleware
-// ======================
+app.options(/.*/, cors());
 app.use(express.json());
 
-// ======================
-// Routes
-// ======================
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/transactions", transactionRoutes);

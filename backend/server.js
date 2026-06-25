@@ -10,41 +10,31 @@ const transactionRoutes = require("./routes/transactionRoutes");
 
 const app = express();
 
-// Connect DB
 connectDB();
 
-// CORS Configuration
 const allowedOrigins = [
-  'https://expanse-tracker-chi.vercel.app', // Aapki live Vercel site
-  'http://localhost:3000'                    // Aapka local development url
+  "https://expanse-tracker-chi.vercel.app",
+  "https://finance-tracker-chi.vercel.app", // Aapka naya URL agar badla hai toh
+  "http://localhost:3000"
 ];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    // allow requests with no origin (like mobile apps or postman/curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
     }
-    return callback(null, true);
   },
-  credentials: true 
-};
+  credentials: true
+}));
 
-// Use CORS with options
-app.use(cors(corsOptions));
-
-// Body Parser Middleware
 app.use(express.json());
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/transactions", transactionRoutes);
 
-// Base Route
 app.get("/", (req, res) => {
   res.send("Finance Tracker Backend Running");
 });

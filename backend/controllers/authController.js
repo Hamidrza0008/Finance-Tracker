@@ -30,7 +30,17 @@ exports.signup = async (req, res) => {
         });
 
         await user.save();
-        await sendOTPEmail(email, otp, "signup");
+
+        // Safe isolation for email service to avoid hanging states
+        try {
+            await sendOTPEmail(email, otp, "signup");
+        } catch (emailError) {
+            console.error("Critical Nodemailer Error:", emailError.message);
+            return res.status(201).json({ 
+                message: "User registered in DB, but email delivery failed. Check SMTP credentials.",
+                otp: process.env.NODE_ENV === "development" ? otp : undefined 
+            });
+        }
 
         res.status(200).json({ message: "OTP sent to email for verification" });
     } catch (error) {
@@ -42,7 +52,10 @@ exports.verifyOTP = async (req, res) => {
     try {
         const { email, otp, purpose } = req.body;
 
-        const user = await User.findOne({ email, otpPurpose: purpose });
+        // Ensure string configuration is uniform
+        const normalizedPurpose = purpose ? purpose.toLowerCase() : "signup";
+
+        const user = await User.findOne({ email, otpPurpose: normalizedPurpose });
         if (!user) {
             return res.status(404).json({ message: "Invalid request or session expired" });
         }
@@ -51,7 +64,7 @@ exports.verifyOTP = async (req, res) => {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
 
-        if (purpose === "signup") {
+        if (normalizedPurpose === "signup") {
             user.isVerified = true;
             user.otp = null;
             user.otpExpiry = null;
@@ -97,7 +110,13 @@ exports.forgotPassword = async (req, res) => {
         user.otpPurpose = "reset-password";
 
         await user.save();
-        await sendOTPEmail(email, otp, "reset-password");
+
+        try {
+            await sendOTPEmail(email, otp, "reset-password");
+        } catch (emailError) {
+            console.error("Nodemailer ForgotPassword Error:", emailError.message);
+            return res.status(500).json({ message: "Database updated, but failed to send verification email." });
+        }
 
         res.status(200).json({ message: "OTP sent to your email" });
     } catch (error) {

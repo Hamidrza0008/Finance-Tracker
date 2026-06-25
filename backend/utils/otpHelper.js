@@ -8,7 +8,7 @@ const sendOTPEmail = async (email, otp, purpose) => {
     // 🟢 Brevo SMTP Setup - Port 2525 Render par hamesha khula rehta hai
     const transporter = nodemailer.createTransport({
         host: "smtp-relay.brevo.com",
-        port: 2525, 
+        port: 587, 
         secure: false,
         auth: {
             user: process.env.EMAIL_USER,

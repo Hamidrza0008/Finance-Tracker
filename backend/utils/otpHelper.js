@@ -5,19 +5,22 @@ const generateOTP = () => {
 };
 
 const sendOTPEmail = async (email, otp, purpose) => {
-    // 🟢 Gmail + Port 587 ka ultimate production combination
     const transporter = nodemailer.createTransport({
-        service: "gmail", 
+        service: "gmail",
         host: "smtp.gmail.com",
         port: 587,
-        secure: false, // 587 ke sath false hi rahega
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS, // Tumhara 16-digit app password
+            pass: process.env.EMAIL_PASS,
         },
+        // 🟢 FIX: Render ko IPv4 par force karne ke liye aur timeout badhane ke liye
+        connectionTimeout: 10000, // 10 seconds timeout
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
+        dnsTimeout: 10000,
         tls: {
-            rejectUnauthorized: false,
-            ciphers: 'SSLv3' // Render ke secure handshake ko pass karwane ke liye
+            rejectUnauthorized: false
         }
     });
 

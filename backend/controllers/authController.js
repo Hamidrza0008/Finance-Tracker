@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { generateOTP, sendOTPEmail } = require("../utils/otpHelper");
+
 exports.signup = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -29,17 +30,10 @@ exports.signup = async (req, res) => {
         });
 
         await user.save();
+        await sendOTPEmail(email, otp, "signup");
 
-        // 🟢 EMAIL KO BACKGROUND ME BHEJENGE (AWAIT HATA DIYA)
-        sendOTPEmail(email, otp, "signup")
-            .then(() => console.log(`🟢 Email triggered for ${email}`))
-            .catch((err) => console.error("🔴 Email delivery failed in background:", err.message));
-
-        // Frontend ko turant free karo taaki 502 error na aaye
-        return res.status(200).json({ message: "OTP sent to email for verification" });
-
+        res.status(200).json({ message: "OTP sent to email for verification" });
     } catch (error) {
-        console.error("🔴 Signup Controller Main Error:", error.message);
         res.status(500).json({ message: error.message });
     }
 };

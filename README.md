@@ -1,4 +1,4 @@
-💰 Finance Tracker
+💰 Finance Tracker - this is a assignment project 
 
 A full-stack Finance Tracker application built using Next.js, Node.js, Express.js, and MongoDB. It helps users manage their personal finances by securely tracking income and expenses.
 
